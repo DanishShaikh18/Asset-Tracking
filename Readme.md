@@ -1,7 +1,7 @@
 # Asset Tracking System
 
 A CLI-based internal asset tracking system built with Spring Boot and PostgreSQL.
-### This project helps organizations track assets, assign them to users, return assets, and maintain full assignment history.
+This project helps organizations track assets, assign them to users, return assets, and maintain full assignment history.
 
 ## Features
 
@@ -23,7 +23,8 @@ A CLI-based internal asset tracking system built with Spring Boot and PostgreSQL
 <br>
 Create this DB manually in your PostgreSQL ( pgadmin )
 <br>
-```sql
+
+```
 CREATE DATABASE asset_db;
 ```
 
