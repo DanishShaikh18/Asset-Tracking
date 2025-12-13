@@ -20,7 +20,9 @@ A CLI-based internal asset tracking system built with Spring Boot and PostgreSQL
 ## Setup Instructions
 
 ### 1. Create PostgreSQL Database
-
+<br>
+Create this DB manually in your PostgreSQL ( pgadmin )
+<br>
 ```sql
 CREATE DATABASE asset_db;
 ```
