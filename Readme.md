@@ -20,10 +20,8 @@ This project helps organizations track assets, assign them to users, return asse
 ## Setup Instructions
 
 ### 1. Create PostgreSQL Database
-<br>
 Create this DB manually in your PostgreSQL ( pgadmin )
 <br>
-
 ```
 CREATE DATABASE asset_db;
 ```
