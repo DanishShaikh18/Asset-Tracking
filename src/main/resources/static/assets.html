@@ -1,0 +1,109 @@
+<!-- File: src/main/resources/static/assets.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Tracking System - Assets</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Asset Tracking System</div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="assets.html" class="active">Assets</a></li>
+            <li><a href="users.html">Users</a></li>
+            <li><a href="history.html">History</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Asset Management</h1>
+        
+        <!-- Add Asset Form -->
+        <div class="card">
+            <h2>Add New Asset</h2>
+            <form id="addAssetForm">
+                <div class="form-group">
+                    <label for="assetName">Asset Name</label>
+                    <input type="text" id="assetName" required placeholder="e.g., Dell Laptop XPS 15">
+                </div>
+                <div class="form-group">
+                    <label for="assetType">Asset Type</label>
+                    <input type="text" id="assetType" required placeholder="e.g., Laptop, Monitor, Mouse">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Asset</button>
+            </form>
+        </div>
+
+        <!-- Search Assets -->
+        <div class="card">
+            <h2>Search Assets</h2>
+            <input type="text" id="searchInput" placeholder="Search by name or type..." class="search-input">
+        </div>
+
+        <!-- Asset List -->
+        <div class="card">
+            <h2>All Assets</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assetTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Assign Modal -->
+        <div id="assignModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Assign Asset</h2>
+                <form id="assignForm">
+                    <input type="hidden" id="assignAssetId">
+                    <div class="form-group">
+                        <label>Asset: <span id="assignAssetName"></span></label>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignUserId">Select User</label>
+                        <select id="assignUserId" required>
+                            <option value="">-- Select User --</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Assign</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Return Modal -->
+        <div id="returnModal" class="modal">
+            <div class="modal-content">
+                <span class="close-return">&times;</span>
+                <h2>Return Asset</h2>
+                <form id="returnForm">
+                    <input type="hidden" id="returnAssetId">
+                    <div class="form-group">
+                        <label>Asset: <span id="returnAssetName"></span></label>
+                    </div>
+                    <p>Are you sure you want to return this asset?</p>
+                    <button type="submit" class="btn btn-success">Return Asset</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!-- File: src/main/resources/static/users.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Tracking System - Users</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Asset Tracking System</div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="assets.html">Assets</a></li>
+            <li><a href="users.html" class="active">Users</a></li>
+            <li><a href="history.html">History</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>User Management</h1>
+        
+        <!-- Add User Form -->
+        <div class="card">
+            <h2>Add New User</h2>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="userName">User Name</label>
+                    <input type="text" id="userName" required placeholder="e.g., John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" required placeholder="e.g., john.doe@company.com">
+                </div>
+                <button type="submit" class="btn btn-success">Add User</button>
+            </form>
+        </div>
+
+        <!-- User List -->
+        <div class="card">
+            <h2>All Users</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="3" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+
+        // Load all users
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/users`);
+                const users = await response.json();
+                
+                const tbody = document.getElementById('userTableBody');
+                
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center">No users found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = users.map(user => `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('userTableBody').innerHTML = 
+                    '<tr><td colspan="3" class="text-center error">Error loading users</td></tr>';
+            }
+        }
+
+        // Add user form submission
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email })
+                });
+                
+                if (response.ok) {
+                    alert('User added successfully!');
+                    document.getElementById('addUserForm').reset();
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error adding user');
+                }
+            } catch (error) {
+                console.error('Error adding user:', error);
+                alert('Error adding user');
+            }
+        });
+
+        // Load users on page load
+        loadUsers();
+    </script>
+</body>
+</html>

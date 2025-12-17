@@ -1,0 +1,92 @@
+<!-- File: src/main/resources/static/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Tracking System - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Asset Tracking System</div>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="active">Dashboard</a></li>
+            <li><a href="assets.html">Assets</a></li>
+            <li><a href="users.html">Users</a></li>
+            <li><a href="history.html">History</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Dashboard</h1>
+        
+        <div class="dashboard-grid">
+            <div class="stat-card blue">
+                <div class="stat-icon">📦</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalAssets">0</div>
+                    <div class="stat-label">Total Assets</div>
+                </div>
+            </div>
+            
+            <div class="stat-card green">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="availableAssets">0</div>
+                    <div class="stat-label">Available Assets</div>
+                </div>
+            </div>
+            
+            <div class="stat-card red">
+                <div class="stat-icon">🔒</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="assignedAssets">0</div>
+                    <div class="stat-label">Assigned Assets</div>
+                </div>
+            </div>
+            
+            <div class="stat-card purple">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+                <a href="assets.html" class="btn btn-primary">Manage Assets</a>
+                <a href="users.html" class="btn btn-success">Manage Users</a>
+                <a href="history.html" class="btn btn-info">View History</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch dashboard statistics
+        async function loadDashboard() {
+            try {
+                const [totalAssets, availableAssets, assignedAssets, totalUsers] = await Promise.all([
+                    fetch('http://localhost:8080/api/assets/count').then(r => r.json()),
+                    fetch('http://localhost:8080/api/assets/available/count').then(r => r.json()),
+                    fetch('http://localhost:8080/api/assets/assigned/count').then(r => r.json()),
+                    fetch('http://localhost:8080/api/users/count').then(r => r.json())
+                ]);
+
+                document.getElementById('totalAssets').textContent = totalAssets;
+                document.getElementById('availableAssets').textContent = availableAssets;
+                document.getElementById('assignedAssets').textContent = assignedAssets;
+                document.getElementById('totalUsers').textContent = totalUsers;
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Load dashboard on page load
+        loadDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!-- File: src/main/resources/static/history.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Tracking System - History</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Asset Tracking System</div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="assets.html">Assets</a></li>
+            <li><a href="users.html">Users</a></li>
+            <li><a href="history.html" class="active">History</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Assignment History</h1>
+        
+        <div class="card">
+            <h2>All Assignments</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Asset</th>
+                            <th>User</th>
+                            <th>Assigned At</th>
+                            <th>Returned At</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Load assignment history
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_URL}/history`);
+                const assignments = await response.json();
+                
+                const tbody = document.getElementById('historyTableBody');
+                
+                if (assignments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No assignment history found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = assignments.map(assignment => {
+                    const status = assignment.returnedAt ? 'RETURNED' : 'ACTIVE';
+                    const statusClass = assignment.returnedAt ? 'badge-success' : 'badge-danger';
+                    
+                    return `
+                        <tr>
+                            <td>${assignment.id}</td>
+                            <td>${assignment.asset.name}</td>
+                            <td>${assignment.user.name}</td>
+                            <td>${formatDate(assignment.assignedAt)}</td>
+                            <td>${formatDate(assignment.returnedAt)}</td>
+                            <td><span class="badge ${statusClass}">${status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading history:', error);
+                document.getElementById('historyTableBody').innerHTML = 
+                    '<tr><td colspan="6" class="text-center error">Error loading history</td></tr>';
+            }
+        }
+
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+</html>

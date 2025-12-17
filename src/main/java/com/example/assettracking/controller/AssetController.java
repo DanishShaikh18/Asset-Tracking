@@ -4,42 +4,52 @@ package com.example.assettracking.controller;
 import com.example.assettracking.model.Asset;
 import com.example.assettracking.service.AssetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import java.util.List;
-import java.util.Scanner;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Component
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/assets")
+@CrossOrigin(origins = "*")
 public class AssetController {
     
     @Autowired
     private AssetService assetService;
     
-    public void addAsset(Scanner scanner) {
-        System.out.print("Enter asset name: ");
-        String name = scanner.nextLine();
-        
-        System.out.print("Enter asset type (e.g., Laptop, Monitor, Mouse): ");
-        String type = scanner.nextLine();
-        
-        Asset asset = assetService.addAsset(name, type);
-        System.out.println("✓ Asset added successfully: " + asset);
+    @GetMapping
+    public ResponseEntity<List<Asset>> getAllAssets() {
+        return ResponseEntity.ok(assetService.getAllAssets());
     }
     
-    public void viewAllAssets() {
-        List<Asset> assets = assetService.getAllAssets();
-        
-        if (assets.isEmpty()) {
-            System.out.println("No assets found.");
-            return;
-        }
-        
-        System.out.println("\n=== ALL ASSETS ===");
-        for (Asset asset : assets) {
-            System.out.println("ID: " + asset.getId() + 
-                             " | Name: " + asset.getName() + 
-                             " | Type: " + asset.getType() + 
-                             " | Status: " + asset.getStatus());
-        }
-        System.out.println("==================\n");
+    @PostMapping
+    public ResponseEntity<Asset> addAsset(@RequestBody Map<String, String> request) {
+        String name = request.get("name");
+        String type = request.get("type");
+        Asset asset = assetService.addAsset(name, type);
+        return ResponseEntity.ok(asset);
+    }
+    
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCount() {
+        long count = assetService.getAllAssets().size();
+        return ResponseEntity.ok(count);
+    }
+    
+    @GetMapping("/available/count")
+    public ResponseEntity<Long> getAvailableCount() {
+        long count = assetService.getAllAssets().stream()
+            .filter(a -> "AVAILABLE".equals(a.getStatus()))
+            .count();
+        return ResponseEntity.ok(count);
+    }
+    
+    @GetMapping("/assigned/count")
+    public ResponseEntity<Long> getAssignedCount() {
+        long count = assetService.getAllAssets().stream()
+            .filter(a -> "ASSIGNED".equals(a.getStatus()))
+            .count();
+        return ResponseEntity.ok(count);
     }
 }

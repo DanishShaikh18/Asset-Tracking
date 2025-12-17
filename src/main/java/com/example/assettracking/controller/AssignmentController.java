@@ -8,12 +8,16 @@ import com.example.assettracking.service.AssetService;
 import com.example.assettracking.service.AssignmentService;
 import com.example.assettracking.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Component
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
 public class AssignmentController {
     
     @Autowired
@@ -25,68 +29,50 @@ public class AssignmentController {
     @Autowired
     private UserService userService;
     
-    public void assignAsset(Scanner scanner) {
-        System.out.print("Enter Asset ID to assign: ");
-        Long assetId = Long.parseLong(scanner.nextLine());
+    @PostMapping("/assign")
+    public ResponseEntity<?> assignAsset(@RequestBody Map<String, Long> request) {
+        Long assetId = request.get("assetId");
+        Long userId = request.get("userId");
         
         Optional<Asset> assetOpt = assetService.getAssetById(assetId);
         if (assetOpt.isEmpty()) {
-            System.out.println("✗ Asset not found.");
-            return;
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Asset not found"));
         }
         
         Asset asset = assetOpt.get();
         if (!"AVAILABLE".equals(asset.getStatus())) {
-            System.out.println("✗ Asset is not available. Current status: " + asset.getStatus());
-            return;
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Asset is not available. Current status: " + asset.getStatus()));
         }
-        
-        System.out.print("Enter User ID to assign to: ");
-        Long userId = Long.parseLong(scanner.nextLine());
         
         Optional<User> userOpt = userService.getUserById(userId);
         if (userOpt.isEmpty()) {
-            System.out.println("✗ User not found.");
-            return;
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "User not found"));
         }
         
         User user = userOpt.get();
         Assignment assignment = assignmentService.assignAsset(asset, user);
-        System.out.println("✓ Asset assigned successfully: " + assignment);
+        return ResponseEntity.ok(assignment);
     }
     
-    public void returnAsset(Scanner scanner) {
-        System.out.print("Enter Asset ID to return: ");
-        Long assetId = Long.parseLong(scanner.nextLine());
+    @PostMapping("/return")
+    public ResponseEntity<?> returnAsset(@RequestBody Map<String, Long> request) {
+        Long assetId = request.get("assetId");
         
         Assignment assignment = assignmentService.returnAsset(assetId);
         
         if (assignment == null) {
-            System.out.println("✗ No active assignment found for this asset.");
-            return;
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "No active assignment found for this asset"));
         }
         
-        System.out.println("✓ Asset returned successfully: " + assignment);
+        return ResponseEntity.ok(assignment);
     }
     
-    public void viewAssignmentHistory() {
-        List<Assignment> assignments = assignmentService.getAllAssignments();
-        
-        if (assignments.isEmpty()) {
-            System.out.println("No assignment history found.");
-            return;
-        }
-        
-        System.out.println("\n=== ASSIGNMENT HISTORY ===");
-        for (Assignment assignment : assignments) {
-            String status = assignment.getReturnedAt() == null ? "ACTIVE" : "RETURNED";
-            System.out.println("ID: " + assignment.getId() + 
-                             " | Asset: " + assignment.getAsset().getName() + 
-                             " | User: " + assignment.getUser().getName() + 
-                             " | Assigned: " + assignment.getAssignedAt() + 
-                             " | Returned: " + (assignment.getReturnedAt() != null ? assignment.getReturnedAt() : "N/A") +
-                             " | Status: " + status);
-        }
-        System.out.println("==========================\n");
+    @GetMapping("/history")
+    public ResponseEntity<List<Assignment>> getAssignmentHistory() {
+        return ResponseEntity.ok(assignmentService.getAllAssignments());
     }
 }
