@@ -20,7 +20,7 @@
 
     <div class="container">
         <h1>Dashboard</h1>
-        
+
         <div class="dashboard-grid">
             <div class="stat-card blue">
                 <div class="stat-icon">📦</div>
@@ -29,7 +29,7 @@
                     <div class="stat-label">Total Assets</div>
                 </div>
             </div>
-            
+
             <div class="stat-card green">
                 <div class="stat-icon">✅</div>
                 <div class="stat-info">
@@ -37,7 +37,7 @@
                     <div class="stat-label">Available Assets</div>
                 </div>
             </div>
-            
+
             <div class="stat-card red">
                 <div class="stat-icon">🔒</div>
                 <div class="stat-info">
@@ -45,7 +45,7 @@
                     <div class="stat-label">Assigned Assets</div>
                 </div>
             </div>
-            
+
             <div class="stat-card purple">
                 <div class="stat-icon">👥</div>
                 <div class="stat-info">
@@ -66,20 +66,26 @@
     </div>
 
     <script>
-        // Fetch dashboard statistics
+        // Fetch dashboard statistics (RELATIVE URLs - WORKS EVERYWHERE)
         async function loadDashboard() {
             try {
-                const [totalAssets, availableAssets, assignedAssets, totalUsers] = await Promise.all([
-                    fetch('http://localhost:8080/api/assets/count').then(r => r.json()),
-                    fetch('http://localhost:8080/api/assets/available/count').then(r => r.json()),
-                    fetch('http://localhost:8080/api/assets/assigned/count').then(r => r.json()),
-                    fetch('http://localhost:8080/api/users/count').then(r => r.json())
+                const [
+                    totalAssets,
+                    availableAssets,
+                    assignedAssets,
+                    totalUsers
+                ] = await Promise.all([
+                    fetch('/api/assets/count').then(r => r.json()),
+                    fetch('/api/assets/available/count').then(r => r.json()),
+                    fetch('/api/assets/assigned/count').then(r => r.json()),
+                    fetch('/api/users/count').then(r => r.json())
                 ]);
 
                 document.getElementById('totalAssets').textContent = totalAssets;
                 document.getElementById('availableAssets').textContent = availableAssets;
                 document.getElementById('assignedAssets').textContent = assignedAssets;
                 document.getElementById('totalUsers').textContent = totalUsers;
+
             } catch (error) {
                 console.error('Error loading dashboard:', error);
             }
