@@ -351,3 +351,10 @@ tbody tr:hover {
         width: 100%;
     }
 }
+
+.error-text {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}

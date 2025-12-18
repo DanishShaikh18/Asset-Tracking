@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asset Tracking System - Users</title>
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Email validation warning */
+        .error-text {
+            color: red;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -29,10 +39,15 @@
                     <label for="userName">User Name</label>
                     <input type="text" id="userName" required placeholder="e.g., John Doe">
                 </div>
+
                 <div class="form-group">
                     <label for="userEmail">Email</label>
                     <input type="email" id="userEmail" required placeholder="e.g., john.doe@company.com">
+                    <small id="emailError" class="error-text">
+                        Invalid email format
+                    </small>
                 </div>
+
                 <button type="submit" class="btn btn-success">Add User</button>
             </form>
         </div>
@@ -62,19 +77,43 @@
     <script>
         const API_URL = '/api';
 
+        const emailInput = document.getElementById('userEmail');
+        const emailError = document.getElementById('emailError');
+
+        // Simple email validation
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Live email validation
+        emailInput.addEventListener('input', () => {
+            const email = emailInput.value.trim();
+
+            if (email === '') {
+                emailError.style.display = 'none';
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                emailError.style.display = 'block';
+            } else {
+                emailError.style.display = 'none';
+            }
+        });
+
         // Load all users
         async function loadUsers() {
             try {
                 const response = await fetch(`${API_URL}/users`);
                 const users = await response.json();
-                
+
                 const tbody = document.getElementById('userTableBody');
-                
+
                 if (users.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="3" class="text-center">No users found</td></tr>';
                     return;
                 }
-                
+
                 tbody.innerHTML = users.map(user => `
                     <tr>
                         <td>${user.id}</td>
@@ -84,7 +123,7 @@
                 `).join('');
             } catch (error) {
                 console.error('Error loading users:', error);
-                document.getElementById('userTableBody').innerHTML = 
+                document.getElementById('userTableBody').innerHTML =
                     '<tr><td colspan="3" class="text-center error">Error loading users</td></tr>';
             }
         }
@@ -92,10 +131,16 @@
         // Add user form submission
         document.getElementById('addUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
-            
+
+            const name = document.getElementById('userName').value.trim();
+            const email = emailInput.value.trim();
+
+            // Frontend email validation
+            if (!isValidEmail(email)) {
+                emailError.style.display = 'block';
+                return;
+            }
+
             try {
                 const response = await fetch(`${API_URL}/users`, {
                     method: 'POST',
@@ -104,10 +149,11 @@
                     },
                     body: JSON.stringify({ name, email })
                 });
-                
+
                 if (response.ok) {
                     alert('User added successfully!');
                     document.getElementById('addUserForm').reset();
+                    emailError.style.display = 'none';
                     loadUsers();
                 } else {
                     const error = await response.json();

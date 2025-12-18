@@ -1,28 +1,43 @@
-# Asset Tracking System
+# Asset Tracking System - Web Application
 
-A CLI-based internal asset tracking system built with Spring Boot and PostgreSQL.
-This project helps organizations track assets, assign them to users, return assets, and maintain full assignment history.
+A full-stack web-based internal asset tracking system built with Spring Boot, REST APIs, and vanilla JavaScript.
 
 ## Features
 
-- Add and view company assets
-- Add users
-- Assign assets to users
-- Return assets
-- View complete assignment history
-- CLI-based (no frontend, no REST APIs)
+- **Dashboard**: Real-time statistics for assets and users
+- **Asset Management**: Add, view, assign, and return assets
+- **User Management**: Add and view users
+- **Assignment History**: Complete tracking of all asset assignments
+- **Search Functionality**: Filter assets by name or type
+- **Status Badges**: Visual indicators (Green = AVAILABLE, Red = ASSIGNED)
+- **Smart Validation**: Buttons disabled based on asset status
+
+## Technology Stack
+
+### Backend
+- Java 17
+- Spring Boot 3.1.5
+- Spring Data JPA
+- PostgreSQL
+- REST APIs
+
+### Frontend
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- Fetch API
 
 ## Prerequisites
 
-- Java 17
-- PostgreSQL ( pgadmin )
+- Java 17 or higher
+- Maven 3.6+
+- PostgreSQL 12+
 
 ## Setup Instructions
 
 ### 1. Create PostgreSQL Database
-Create this DB manually in your PostgreSQL ( pgadmin )
-<br>
-```
+
+```sql
 CREATE DATABASE asset_db;
 ```
 
@@ -35,12 +50,10 @@ spring.datasource.username=YOUR_USERNAME
 spring.datasource.password=YOUR_PASSWORD
 ```
 
-Replace `YOUR_USERNAME` and `YOUR_PASSWORD` with your PostgreSQL credentials.
-
 ### 3. Build the Project
 
 ```bash
-./mvnw spring-boot:run
+./mvnw clean install
 ```
 
 ### 4. Run the Application
@@ -49,71 +62,167 @@ Replace `YOUR_USERNAME` and `YOUR_PASSWORD` with your PostgreSQL credentials.
 ./mvnw spring-boot:run
 ```
 
-Or run directly:
+The application will start on **http://localhost:8080**
 
-```bash
-java -jar target/asset-tracking-1.0.0.jar
+## Accessing the Application
+
+Open your browser and navigate to:
+- **Dashboard**: http://localhost:8080/index.html
+- **Assets**: http://localhost:8080/assets.html
+- **Users**: http://localhost:8080/users.html
+- **History**: http://localhost:8080/history.html
+
+## REST API Endpoints
+
+### Assets
+- `GET /api/assets` - Get all assets
+- `POST /api/assets` - Add new asset
+- `GET /api/assets/count` - Get total assets count
+- `GET /api/assets/available/count` - Get available assets count
+- `GET /api/assets/assigned/count` - Get assigned assets count
+
+### Users
+- `GET /api/users` - Get all users
+- `POST /api/users` - Add new user
+- `GET /api/users/count` - Get total users count
+
+### Assignments
+- `POST /api/assign` - Assign asset to user
+- `POST /api/return` - Return asset
+- `GET /api/history` - Get assignment history
+
+## API Request Examples
+
+### Add Asset
+```json
+POST /api/assets
+{
+  "name": "Dell Laptop XPS 15",
+  "type": "Laptop"
+}
 ```
 
-## Usage
-
-The application will display a menu with the following options:
-
-```
-========================================
-              MAIN MENU
-========================================
-1. Add Asset
-2. View All Assets
-3. Add User
-4. Assign Asset
-5. Return Asset
-6. View Assignment History
-0. Exit
-========================================
+### Add User
+```json
+POST /api/users
+{
+  "name": "John Doe",
+  "email": "john.doe@company.com"
+}
 ```
 
-### Example Workflow
+### Assign Asset
+```json
+POST /api/assign
+{
+  "assetId": 1,
+  "userId": 1
+}
+```
 
-1. **Add an Asset**: Choose option 1, enter asset name and type
-2. **Add a User**: Choose option 3, enter user name and email
-3. **Assign Asset**: Choose option 4, enter asset ID and user ID
-4. **Return Asset**: Choose option 5, enter asset ID
-5. **View History**: Choose option 6 to see all assignments
+### Return Asset
+```json
+POST /api/return
+{
+  "assetId": 1
+}
+```
 
 ## Business Rules
 
-- Assets can only be assigned if their status is AVAILABLE
-- When assigned, asset status changes to ASSIGNED
-- When returned, asset status changes back to AVAILABLE
-- All assignment history is preserved
-- returnedAt = NULL indicates asset is currently assigned
+- Assets can only be assigned if status is AVAILABLE
+- When assigned, asset status automatically changes to ASSIGNED
+- When returned, asset status automatically changes to AVAILABLE
+- All assignment history is preserved (no deletions)
+- `returnedAt = NULL` indicates asset is currently assigned
 
-## Database Schema
+## Project Structure
 
-The application automatically creates three tables:
+```
+asset-tracking/
+├── src/
+│   └── main/
+│       ├── java/com/example/assettracking/
+│       │   ├── controller/
+│       │   │   ├── AssetController.java
+│       │   │   ├── UserController.java
+│       │   │   └── AssignmentController.java
+│       │   ├── service/
+│       │   │   ├── AssetService.java
+│       │   │   ├── UserService.java
+│       │   │   └── AssignmentService.java
+│       │   ├── repository/
+│       │   │   ├── AssetRepository.java
+│       │   │   ├── UserRepository.java
+│       │   │   └── AssignmentRepository.java
+│       │   ├── model/
+│       │   │   ├── Asset.java
+│       │   │   ├── User.java
+│       │   │   └── Assignment.java
+│       │   └── AssetTrackingApplication.java
+│       └── resources/
+│           ├── static/
+│           │   ├── index.html
+│           │   ├── assets.html
+│           │   ├── users.html
+│           │   ├── history.html
+│           │   ├── css/
+│           │   │   └── style.css
+│           │   └── js/
+│           │       └── app.js
+│           └── application.properties
+└── pom.xml
+```
 
-### assets
-- id (Primary Key)
-- name
-- type
-- status (AVAILABLE/ASSIGNED)
+## Features Walkthrough
 
-### users
-- id (Primary Key)
-- name
-- email (unique)
+### Dashboard
+- View real-time counts of total, available, and assigned assets
+- View total users
+- Quick navigation to all sections
 
-### assignments
-- id (Primary Key)
-- asset_id (Foreign Key)
-- user_id (Foreign Key)
-- assigned_at
-- returned_at (nullable)
+### Asset Management
+- Add new assets with name and type
+- View all assets in a table
+- Search assets by name or type (client-side filtering)
+- Assign button is disabled for already assigned assets
+- Return button is disabled for available assets
+- Status badges show asset availability (green/red)
 
-## Technologies Used
+### User Management
+- Add new users with name and email
+- View all users in a table
+- Email validation (unique constraint)
 
-- Spring Boot 3.x.x ( any version starting with 3 )
-- Spring Data JPA
-- PostgreSQL
-- Java 17
+### Assignment History
+- View complete history of all assignments
+- Shows assigned and returned dates
+- Active assignments clearly marked
+- Returned assignments show return timestamp
+
+## Troubleshooting
+
+### Application won't start
+- Check if PostgreSQL is running
+- Verify database credentials in `application.properties`
+- Ensure database `asset_db` exists
+
+### Cannot connect to database
+- Verify PostgreSQL is running on port 5432
+- Check username and password
+- Ensure PostgreSQL accepts connections from localhost
+
+### Frontend not loading
+- Ensure application is running on http://localhost:8080
+- Check browser console for errors
+- Clear browser cache
+
+## Development
+
+To make changes:
+1. Backend changes: Modify Java files and restart application
+2. Frontend changes: Modify HTML/CSS/JS files and refresh browser (no restart needed)
+
+## License
+
+This project is for internal use only.
