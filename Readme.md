@@ -225,4 +225,4 @@ To make changes:
 
 ## License
 
-This project is for internal use only.
+This project is deployed now and will have frequent updates 
